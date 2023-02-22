@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
+import dj_database_url
 from pathlib import Path
+
 
 STRIPE_PUBLIC_KEY = "pk_test_51MddKlHErVcnxa1ai7TfCEU1sXwFwZ4zJ0cKhM8kao3Ej5Hq3UGBBygJZUYLeoJqvGaGKbBIeyaME8DtAXRSSLHL00Wrdfi3PZ"
 STRIPE_SECRET_KEY = "sk_test_51MddKlHErVcnxa1aguHUt85atXZtb26gT5qjyl113jIwZUuv2Pj5Lh7rLPxpLjKKbRwAfgUcNgt9RFTgNb7x0yUo00GOISpkcE"
@@ -23,10 +25,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=2n6$g&bq$==s@l)7nc($s$uvk402x@9wsg7_s29obda5w@)5y'
+#SECRET_KEY = 'django-insecure-=2n6$g&bq$==s@l)7nc($s$uvk402x@9wsg7_s29obda5w@)5y'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-=2n6$g&bq$==s@l)7nc($s$uvk402x@9wsg7_s29obda5w@)5y')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = bool( os.environ.get('DJANGO_DEBUG', True) )
 
 ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com']
 
@@ -45,6 +49,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -129,3 +134,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
